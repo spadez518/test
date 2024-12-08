@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简单交互小游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            background-image: linear-gradient(45deg, #f0f0f0, #e0e0e0); /* 渐变背景 */
+            margin: 0;
+        }
+       .game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease; /* 过渡效果 */
+        }
+        input {
+            width: 150px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05); /* 鼠标悬停时放大效果 */
+        }
+        #result {
+            font-size: 20px;
+            color: red;
+        }
+        #guessCount {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>猜数字游戏</h1>
+        <p>我已经想好了一个 1 到 100 之间的数字，你能猜到它是多少吗？</p>
+        <input type="number" id="guessInput">
+        <button id="guessButton">猜数字</button>
+        <button id="resetButton">重置游戏</button>
+        <div id="result"></div>
+        <div id="guessCount">猜测次数: <span id="count">0</span></div>
+        <div id="hint">请输入一个有效的数字。</div> <!-- 新增提示信息 -->
+    </div>
+    <script>
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let guessButton = document.getElementById('guessButton');
+        let guessInput = document.getElementById('guessInput');
+        let resultDiv = document.getElementById('result');
+        let resetButton = document.getElementById('resetButton');
+        let countSpan = document.getElementById('count');
+        let guessCount = 0;
+        let hintDiv = document.getElementById('hint');
+        const MAX_GUESSES = 10; // 猜测次数上限
+
+        guessButton.addEventListener('click', function() {
+            let userGuess = parseInt(guessInput.value);
+            if (isNaN(userGuess)) {
+                hintDiv.textContent = '请输入一个有效的数字。';
+                return;
+            }
+            guessCount++;
+            countSpan.textContent = guessCount;
+            if (userGuess === secretNumber) {
+                resultDiv.textContent = `恭喜你，猜对了！你用了 ${guessCount} 次。`;
+            } else if (userGuess < secretNumber) {
+                resultDiv.textContent = '太小了，再试一次吧！';
+            } else {
+                resultDiv.textContent = '太大了，再试一次吧！';
+            }
+            if (guessCount >= MAX_GUESSES) {
+                resultDiv.textContent = `很遗憾，你已经超过了 ${MAX_GUESSES} 次猜测次数，游戏结束。`;
+                guessButton.disabled = true; // 达到上限后禁用猜数字按钮
+            }
+        });
+
+        resetButton.addEventListener('click', function() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            guessCount = 0;
+            countSpan.textContent = guessCount;
+            resultDiv.textContent = '';
+            guessInput.value = '';
+            hintDiv.textContent = '';
+            guessButton.disabled = false; // 重置时启用猜数字按钮
+        });
+    </script>
+</body>
+</html>
