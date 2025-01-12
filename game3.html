@@ -1,152 +1,156 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>弹球游戏</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
- .game-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-        canvas {
-            border: 2px solid #333;
-        }
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
- .result {
-            font-size: 20px;
-            color: red;
-            margin-top: 20px;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+      }
+      .game-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      canvas {
+        border: 2px solid #333;
+      }
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .result {
+        font-size: 20px;
+        color: red;
+        margin-top: 20px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="game-container">
-        <h1>弹球游戏</h1>
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <button id="startButton">开始</button>
-        <button id="pauseButton">暂停</button>
-        <button id="restartButton">重新开始</button>
-        <div class="result"></div>
+      <h1>弹球游戏</h1>
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <button id="startButton">开始</button>
+      <button id="pauseButton">暂停</button>
+      <button id="restartButton">重新开始</button>
+      <div class="result"></div>
     </div>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const startButton = document.getElementById('startButton');
-        const pauseButton = document.getElementById('pauseButton');
-        const restartButton = document.getElementById('restartButton');
-        const resultDiv = document.querySelector('.result');
-        let ballX = 200;
-        let ballY = 200;
-        let ballRadius = 10;
-        // 定义小球的初始速度
-        const INITIAL_BALL_SPEED_X = 1; 
-        const INITIAL_BALL_SPEED_Y = 1; 
-        let ballSpeedX = INITIAL_BALL_SPEED_X; 
-        let ballSpeedY = INITIAL_BALL_SPEED_Y; 
-        let paddleX = 175;
-        let paddleY = 380;
-        let paddleWidth = 50;
-        let paddleHeight = 10;
-        let score = 0;
-        let gameStarted = false;
-        let gamePaused = false;
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const startButton = document.getElementById("startButton");
+      const pauseButton = document.getElementById("pauseButton");
+      const restartButton = document.getElementById("restartButton");
+      const resultDiv = document.querySelector(".result");
+      let ballX = 200;
+      let ballY = 200;
+      let ballRadius = 10;
+      // 定义小球的初始速度
+      const INITIAL_BALL_SPEED_X = 1;
+      const INITIAL_BALL_SPEED_Y = 1;
+      let ballSpeedX = INITIAL_BALL_SPEED_X;
+      let ballSpeedY = INITIAL_BALL_SPEED_Y;
+      let paddleX = 175;
+      let paddleY = 380;
+      let paddleWidth = 50;
+      let paddleHeight = 10;
+      let score = 0;
+      let gameStarted = false;
+      let gamePaused = false;
 
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
-            ctx.fillStyle ='red';
-            ctx.fill();
-        }
+      function drawBall() {
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
+        ctx.fill();
+      }
 
-        function drawPaddle() {
-            ctx.beginPath();
-            ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
-            ctx.fillStyle = 'blue';
-            ctx.fill();
-        }
+      function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+      }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBall();
-            drawPaddle();
-            if (gameStarted &&!gamePaused) {
-                ballX += ballSpeedX;
-                ballY += ballSpeedY;
-                if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
-                    ballSpeedX = -ballSpeedX;
-                }
-                if (ballY - ballRadius < 0) {
-                    ballSpeedY = -ballSpeedY;
-                }
-                if (ballY + ballRadius > paddleY && ballX > paddleX && ballX < paddleX + paddleWidth) {
-                    ballSpeedY = -ballSpeedY;
-                    score++;
-                }
-                if (ballY + ballRadius > canvas.height) {
-                    resultDiv.textContent = '游戏结束，你输了！';
-                    gameStarted = false;
-                }
-            }
-            resultDiv.textContent = `得分: ${score}`;
-            requestAnimationFrame(draw);
-        }
-
-        function movePaddle(event) {
-            if (gameStarted &&!gamePaused) {
-                paddleX = event.clientX - canvas.offsetLeft - paddleWidth / 2;
-                if (paddleX < 0) {
-                    paddleX = 0;
-                } else if (paddleX + paddleWidth > canvas.width) {
-                    paddleX = canvas.width - paddleWidth;
-                }
-            }
-        }
-
-        startButton.addEventListener('click', () => {
-            if (!gameStarted) {
-                gameStarted = true;
-                draw();
-            }
-        });
-
-        pauseButton.addEventListener('click', () => {
-            gamePaused =!gamePaused;
-        });
-
-        restartButton.addEventListener('click', () => {
-            ballX = 200;
-            ballY = 200;
-            // 重新开始时将速度重置为初始速度
-            ballSpeedX = INITIAL_BALL_SPEED_X; 
-            ballSpeedY = INITIAL_BALL_SPEED_Y; 
-            paddleX = 175;
-            paddleY = 380;
-            paddleWidth = 50;
-            paddleHeight = 10;
-            score = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall();
+        drawPaddle();
+        if (gameStarted && !gamePaused) {
+          ballX += ballSpeedX;
+          ballY += ballSpeedY;
+          if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
+            ballSpeedX = -ballSpeedX;
+          }
+          if (ballY - ballRadius < 0) {
+            ballSpeedY = -ballSpeedY;
+          }
+          if (
+            ballY + ballRadius > paddleY &&
+            ballX > paddleX &&
+            ballX < paddleX + paddleWidth
+          ) {
+            ballSpeedY = -ballSpeedY;
+            score++;
+          }
+          if (ballY + ballRadius > canvas.height) {
+            resultDiv.textContent = "游戏结束，你输了！";
             gameStarted = false;
-            gamePaused = false;
-            resultDiv.textContent = '';
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
+          }
+        }
+        resultDiv.textContent = `得分: ${score}`;
+        requestAnimationFrame(draw);
+      }
 
-        canvas.addEventListener('mousemove', movePaddle);
+      function movePaddle(event) {
+        if (gameStarted && !gamePaused) {
+          paddleX = event.clientX - canvas.offsetLeft - paddleWidth / 2;
+          if (paddleX < 0) {
+            paddleX = 0;
+          } else if (paddleX + paddleWidth > canvas.width) {
+            paddleX = canvas.width - paddleWidth;
+          }
+        }
+      }
+
+      startButton.addEventListener("click", () => {
+        if (!gameStarted) {
+          gameStarted = true;
+          draw();
+        }
+      });
+
+      pauseButton.addEventListener("click", () => {
+        gamePaused = !gamePaused;
+      });
+
+      restartButton.addEventListener("click", () => {
+        ballX = 200;
+        ballY = 200;
+        // 重新开始时将速度重置为初始速度
+        ballSpeedX = INITIAL_BALL_SPEED_X;
+        ballSpeedY = INITIAL_BALL_SPEED_Y;
+        paddleX = 175;
+        paddleY = 380;
+        paddleWidth = 50;
+        paddleHeight = 10;
+        score = 0;
+        gameStarted = false;
+        gamePaused = false;
+        resultDiv.textContent = "";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      canvas.addEventListener("mousemove", movePaddle);
     </script>
-</body>
+  </body>
 </html>
